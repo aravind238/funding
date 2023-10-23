@@ -1,11 +1,13 @@
 name: My Workflow
 
-on: [push]
+on:
+  push:
+    branches: Devloper
+      
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Check out the code
         uses: actions/checkout@v2
