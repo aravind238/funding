@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<!-- saved from url=(0099)http://dmbdemo.com/clientwebsite/html-dev/funding-admin-interface/pdf-invoice-schedule-summary.html -->
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Funding Admin - Liquid Capital</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link rel="icon" href="{{ config['API_SERVER'] }}static/img/favicon.ico" type="image/x-icon">
+		
+		<!-- <link href="{{ config['API_SERVER'] }}static/css/poppins_300_400_500.css" rel="stylesheet"> -->
+		<!-- <link href="{{ config['API_SERVER'] }}static/css/roboto_400_500.css" rel="stylesheet"> -->
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500" rel="stylesheet">
+    
+    <!-- <link rel="stylesheet" href="{{ config['API_SERVER'] }}static/css/fontawesome.css" type="text/css"> -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+
+		<!-- <link rel="stylesheet" type="text/css" href="https://s3.ca-central-1.amazonaws.com/unoapp.resources.independent/Project/Funding/static/css/jquery.mCustomScrollbar.css">  Don't need this-->
+		<link rel="stylesheet" type="text/css" href="{{ config['API_SERVER'] }}static/css/style.css">
+		<link rel="stylesheet" type="text/css" href="{{ config['API_SERVER'] }}static/css/pdf-style.css">
+
+	</head>
+	<style>
+		.logo {
+			width: 300px;
+			height: 100px;
+		}
+		
+		/* Table Header fields overlapping fixed: https://github.com/wkhtmltopdf/wkhtmltopdf/issues/2367  */
+		thead { display: table-header-group }
+		tfoot { display: table-row-group }
+		tr { page-break-inside: avoid }
+
+		div .detail { page-break-inside: avoid }
+		div .desc { page-break-inside: avoid }
+		div .summary-content-container { page-break-inside: avoid }
+		div .center-fixed-width-container { page-break-inside: avoid }
+		div .full-summary-table { page-break-inside: avoid }
+		.fee-advance-review-table .columns.justify-content-between { page-break-inside: avoid }
+
+		.fee-advance-review-table { max-width: 550px !important; }
+
+		.soa-section .step-status .step-info .count {
+			line-height: 2rem !important;
+		}
+
+		.is-action-lighter {
+			background-color: #fff2f4;
+			border: 1px solid #d0021b;
+			color: #d0021b;
+		}
+		
+		.is-awaiting-lighter {
+    		background-color: #F9EBCA !important;
+			border: 1px solid #bb900d;
+		}
+
+		input[type=checkbox] + label {
+			padding-left: 4rem !important;
+		}
+
+		.checkbox-image + label {
+			padding-left: 4rem !important;
+		}
+		
+		.checkbox-image {
+			height: 27px !important;
+			margin-top: -4px !important;
+			margin-left: -4px !important;
+			position: absolute;
+		}
+
+		.is-attention-lighter  {
+			background-color: #f9ebca ;
+			border: 1px solid #bb900d ;
+		}
+	</style>
+	<body>
+
+		<!-- Page Body ---------------------------------------------------------->
+		<!-- <main role="main" class="section pg-body pdf-page"> -->
+			<!-- <div class="container"> -->
+			<main>
+				<div>
+				<div class="column pg-main-column is-paddingless">
+					<!-- Page Content ------------------- -->
+
+					<section class="section pg-content is-paddingless has-shadow has-background-white">
+						<section class="main-section-header">
+							<div class="columns mb0">
+								<div class="column is-5 pb0">
+									<img class="logo" src="{{ data.branding_logo_url }}" alt="logo">
+									<p class="header-title roboto-medium">Invoice Schedule Summary</p>
+								</div>
+								<!-- <div class="column is-7 has-text-right pb0">
+								<p class="header-title roboto-medium">Liquid Capital Exchange Corp - <span class="has-text-primary"> Company Name
+									{% if company_name %}
+										{{ company_name }}
+									{% endif %}
+								</span></p>
+								</div> -->
+							</div>
+							
+						</section>
+						<section class="main-section-header">
+								<div class="columns">
+									<div class="column">
+										<div>
+										<span class="poppins-regular">
+												{% if data.client %}
+													{{ data.client.name }}
+												{% endif %}
+										</span>
+										<span class="lcei-info poppins-bold">
+												{% if data.control_account_name %}
+													{{ data.control_account_name }}
+												{% endif %}
+										</span>
+											{% if data.control_account_name %}
+												{% if data.control_account_name == 'LCEC CDN' %}													
+													<img src="{{ config['API_SERVER'] }}static/img/canada-flag.png">
+												{% elif data.control_account_name == 'LCEC US' %}													
+													<img src="{{ config['API_SERVER'] }}static/img/us-flag.png" >
+												{% elif data.control_account_name == 'LCEI. US' %}													
+													<img src="{{ config['API_SERVER'] }}static/img/us-flag.png" >
+												{% endif %}
+											{% endif %}
+										</span>
+									</div>
+									<div class="id poppins-regular">SOA ID: 
+										{% if data.soa %}
+											{{ data.soa.ref_client_soa_id }} 
+										{% endif %}
+										{% if data.soa.high_priority %}
+										<span style="color: red; font-style: italic ">(ASAP)</span>
+										{% endif %}	
+										{% if data.soa.has_action_required %}									
+										<span class="lcei-info poppins-bold">ACTION REQUIRED</span>
+										{% endif %}
+										<br>
+										Cadence ID:
+										{% if data.client %}
+											{{ data.client.ref_client_no }} 
+										{% endif %} <br>
+										Payment Type:
+										{% if data.payment_type %}
+											{{ data.payment_type |join(", ") }}
+										{% endif %} <br>
+										Client Number:
+										{% if data.soa %}
+											{{ data.soa.client_id }}
+										{% endif %} <br>
+										Reference Number:
+										{% if data.soa %}
+											{{ data.soa.reference_number|default("", true) }}
+										{% endif %}									
+									</div>
+									<div class="column has-text-right">										
+										<div class="date poppins-regular">
+											{% if data.soa_submitted_at %}
+												Submission Date by Principal: {{ data.soa_submitted_at.strftime('%B %d, %Y') }}
+											{% else %}
+												Submission Date by Principal: Request has not been submitted yet by Principal
+											{% endif %}
+										</div>
+										<div class="date poppins-regular">
+											{% if data.current_time %}
+												Download Date: {{ data.current_time.strftime('%B %d, %Y')  }}
+											{% endif %}
+										</div>
+										<div class="poppins-regular">
+												<!-- {% if created_by %}
+												Created By:	{{ created_by }}
+												{% endif %} -->
+											<!-- {% if data.group_principal %}
+												{% if data.group_principal.first_name %}
+													Created By:	{{ data.group_principal.first_name }} {{ data.group_principal.last_name|default("", true) }}
+												{% else %}
+													Created By:	{{ data.group_principal.username|default("", true) }}
+												{% endif %}
+											{% endif %} -->
+										</div>
+										<div class="poppins-regular">
+												<!-- {% if created_by %}
+												Submitted by: {{ created_by }}
+												{% endif %} -->
+											<!-- {% if data.group_principal %}
+												{% if data.group_principal.first_name %}
+													Submitted By: {{ data.group_principal.first_name }} {{ data.group_principal.last_name|default("", true) }}
+												{% else %}
+													Submitted By: {{ data.group_principal.username|default("", true) }}
+												{% endif %}
+											{% endif %} -->
+										</div>
+									</div>
+								</div>
+						</section>
+
+						<section class="section-content summary-content has-shadow-black-light soa-section invoice-summary">
+							<div class="summary-content-container">
+								<div class="columns is-multiline">
+									<div class="column is-3 is-flex">
+										<div class="step-status is-completed">
+											<div class="icon is-small">
+												<img src="{{ config['API_SERVER'] }}static/img/icon_checkmark.svg" alt="">
+											</div>
+											<div class="step-info">
+												<h4 class="count"> Step 1: Invoice Total</h4>
+												<p class="description">
+													{% if data.soa.invoice_total %}
+														$ {{ data.soa.invoice_total|default("0.00", true) }}
+													{% else %}
+														$ 0
+													{% endif %}
+												</p>
+											</div>
+										</div>
+									</div>
+									<div class="column is-3 is-flex">
+										<div class="step-status">
+											<div class="icon is-small">
+												<img src="{{ config['API_SERVER'] }}static/img/icon_checkmark.svg" alt="">
+											</div>
+											<div class="step-info">
+												<h4 class="count">Step 2: Review Confirmation</h4>
+												<p class="description">
+													{% if data.soa %}
+														{{ data.soa.notes }}
+													{% endif %}
+												</p>
+											</div>
+										</div>
+									</div>
+									<div class="column is-3 is-flex">
+										<div class="step-status is-completed">
+											<div class="icon is-small">
+												<img src="{{ config['API_SERVER'] }}static/img/icon_checkmark.svg" alt="">
+											</div>
+											<div class="step-info">
+												<h4 class="count">Step 3: Advance Amount</h4>
+												<p class="description">
+													{% if data.soa %}
+														$ {{ data.soa.advance_amount }}
+													{% endif %}
+												</p>
+											</div>
+										</div>
+									</div>
+
+									<div class="column is-3 is-flex">
+										<div class="step-status is-completed">
+											<div class="icon is-small">
+												<img src="{{ config['API_SERVER'] }}static/img/icon_checkmark.svg" alt="">
+											</div>
+											<div class="step-info">
+												<h4 class="count">Step 4: Disbursement Total</h4>
+												<p class="description">
+													{% if data.client %}
+														Client: {{ data.client.name }}</br>
+													{% endif %}
+													{% if data.client_soa_disbursement %}
+														{% for client_soa in data.client_soa_disbursement %}
+															<!-- {% if client_soa.client_account %}
+																Account: **** {{ client_soa.client_account[-4:]|default("", true) }}
+																</br> 
+															{% endif %} -->
+															$ {{ '{0:,.2f}'.format(client_soa.client_amount) }} 
+															 </br>
+														{% endfor %} 
+													{% endif %} 
+												</p>
+												<p class="description">
+													{% if data.payee_soa_disbursement %}												 	
+														{% for payee_soa in data.payee_soa_disbursement %}	
+															Payee:	{{ payee_soa.payee_name|default("", true) }} <br>
+															$  {{ '{0:,.2f}'.format(payee_soa.amount) }}  
+															 </br>
+														{% endfor %} 
+													{% endif %} 
+												</p>
+											</div>
+										</div>
+									</div>     							
+								</div>
+							</div>
+						</section>
+
+						{% if 'soa_view_details_invoice_schedule_summary' in data.show_info %}
+						<!-- section: Invoice schedule summary -->
+						<section class="section-content">
+							<div class="center-fixed-width-container invoice-schedule-summary">
+								<h1 class="title">Invoice Schedule Summary</h1>
+								<section class="summary-content">
+									<div class="summary-item">
+										<div class="summary-heading">Preview Client Balances</div>
+										{% if data.preview_client_balances.flag_type == 'warning' %}
+											<div class="detail is-rounded notification request-created pv5 is-awaiting-lighter">
+												<figure class="image icon is-32x32">
+													<img src="{{ config['API_SERVER'] }}static/img/icon-info.svg" alt="image" class="is-inline-block">
+												</figure>
+												{{ data.preview_client_balances.flag_msg }}
+											</div>
+										{% elif data.preview_client_balances.flag_type == 'success' %}
+											<div class="detail is-rounded notification request-created pv5 is-success">
+												<figure class="image icon is-32x32">
+													<img src="{{ config['API_SERVER'] }}static/img/icon_checkmark.svg" alt="image" class="is-inline-block">
+												</figure>
+												{{ data.preview_client_balances.flag_msg }}
+											</div>
+										{% elif data.preview_client_balances.flag_type == 'error' %}
+											<div class="detail is-rounded notification request-created pv5 is-action-lighter">
+												<figure class="image icon is-32x32">
+													<img src="{{ config['API_SERVER'] }}static/img/icon_exclamation.svg" alt="image" class="is-inline-block">
+												</figure>
+												{{ data.preview_client_balances.flag_msg }}
+											</div>
+										{% else %}
+											<div class="detail is-rounded notification request-created pv5">
+												<figure class="image icon is-32x32">
+													<img src="{{ config['API_SERVER'] }}static/img/icon_checkmark.svg" alt="image" class="is-inline-block">
+												</figure>
+												{{ data.preview_client_balances.flag_msg }}
+											</div>
+										{% endif %}
+									</div>
+									<div class="summary-item">
+										<div class="summary-heading">Preview Debt Collector</div>
+										{% if data.user_role == "ae" %}
+											{% if not data.new_debtors | length == 0 %}
+											<div class="detail is-rounded notification request-created pv5 is-attention-lighter">
+												<figure class="image icon is-32x32">
+													<img src="{{ config['API_SERVER'] }}static/img/icon-info.svg" alt="image" class="is-inline-block">
+												</figure>
+												<p>
+													Attention! New Debtor(s) in this request.
+												</p>
+											</div>
+											{% endif %}
+										{% endif %}
+										{% if not data.preview_debtor_limits | length == 0 %}
+											{% for debtor_name, invoice_amount_total in data.preview_debtor_limits.items() %}
+												<div class="detail is-rounded notification request-created pv5 is-action-lighter">
+													<figure class="image icon is-32x32">
+														<img src="{{ config['API_SERVER'] }}static/img/icon_exclamation.svg" alt="image" class="is-inline-block">
+													</figure>
+													<p>
+														{{ debtor_name }} will be OVER LIMIT if this SOA is funded
+													</p>
+												</div>
+											{% endfor %}
+										{% else %}
+											<div class="detail is-rounded notification request-created pv5 is-success">
+											<figure class="image icon is-32x32">
+												<img src="{{ config['API_SERVER'] }}static/img/icon_checkmark.svg" alt="image" class="is-inline-block">
+											</figure>
+											<p>
+												All Debtors are with <b>in limit</b>
+											</p>
+										</div>
+										{% endif %}
+									</div>
+									<div class="summary-item">
+										<div class="summary-heading">Preview of Invoice Aging by Debtor</div>
+										{% if data.user_role == "ae" %}
+											{% if not data.new_debtors | length == 0 %}
+											<div class="detail is-rounded notification request-created pv5 is-attention-lighter">
+												<figure class="image icon is-32x32">
+													<img src="{{ config['API_SERVER'] }}static/img/icon-info.svg" alt="image" class="is-inline-block">
+												</figure>
+												<p>
+													Attention! New Debtor(s) in this request.
+												</p>
+											</div>
+											{% endif %}
+										{% endif %}
+										{% if not data.preview_invoice_aging_by_debtor | length == 0 %}
+											{% for debtor_name, invoice_amount_total in data.preview_invoice_aging_by_debtor.items() %}
+												<div class="detail is-rounded notification request-created pv5 is-action-lighter">
+													<figure class="image icon is-32x32">
+														<img src="{{ config['API_SERVER'] }}static/img/icon_exclamation.svg" alt="image" class="is-inline-block">
+													</figure>
+													<p>
+														{{ debtor_name }} has $ {{ invoice_amount_total }} in invoices with more than 91 days
+													</p>
+												</div>
+											{% endfor %}
+										{% else %}
+											<div class="detail is-rounded notification request-created pv5 is-success">
+												<figure class="image icon is-32x32">
+													<img src="{{ config['API_SERVER'] }}static/img/icon_checkmark.svg" alt="image" class="is-inline-block">
+												</figure>
+												Debtors are in Good standing
+											</div>
+										{% endif %}
+									</div>
+								</section>
+							</div>
+						</section>
+						{% endif %}
+
+						<section class="section-content">
+							<div class="full-summary-table">
+								<div class="submission-summary">
+									<h1 class="title table-title">Invoice table</h1>
+									<table class="table">
+									<thead>
+										<tr>
+										<th class="invoice">Invoice Number</th>
+										<th class="date">Invoice Date</th>
+										<th class="terms">Terms</th>
+										<th class="pon">PO Number</th>
+										<th class="debtor-name">Debtor Name</th>
+										<th class="action">Actions</th>
+										<th  class="action"></th>
+										<th class="action">Amount</th>
+										</tr>
+									</thead>
+										{% if data.invoice %}
+											{% for invoice_obj in data.invoice %}
+											<tbody>
+												<tr>
+													<td>{{ invoice_obj.invoice_number }}</td>
+													<td>{{ invoice_obj.invoice_date }}</td>
+													<td>{{ invoice_obj.terms }}</td>
+													<td>{{ invoice_obj.po_number }}</td>
+													<td>{{ invoice_obj.debtor_name }}</td>
+													<td>{{ invoice_obj.actions }}</td>
+													<td  colspan="2">$ {{ invoice_obj.amount }}</td>
+												</tr> 
+											</tbody>
+											{% endfor %}  
+										{% else %} 
+											<tbody>
+												<tr>
+													<td colspan="6" style="text-align:center;">No Data</td>
+												</tr>										
+											</tbody>                                  
+										{% endif %}								
+											
+												<tr>
+													<td colspan="8"> 
+														<span class="has-text-right">
+															<b>Invoice Total</b>
+														</span> 
+														&nbsp;&nbsp;&nbsp;<span class="has-text-primary">{% if data.soa.invoice_total %}
+																$ {{ data.soa.invoice_total|default("0.00", true) }}
+															{% endif %}</span>
+													
+													</td>													
+												</tr>
+												{% if data.cash_reserve_releases %}
+												<tr>
+													<td colspan="8"><span class="has-text-right">
+															<b>Invoice Cash Reserves Release</b>
+														</span> 
+														&nbsp;&nbsp;&nbsp;<span class="has-text-primary">$ {{ data.cash_reserve_releases }}
+															</span>
+														 </td>
+														</tr>
+												{% endif %}
+																		 	
+									</table>
+								</div>
+							</div>
+
+							<!-- section: advance-details -->
+							<div class="center-fixed-width-container">
+								<h1 class="table-title title mt30">Advance Details</h1>
+								<div class="advance-details-section">
+									<div class="columns">
+										<div class="column is-7">
+											<div class="check-list">
+												<ul>
+													<li>
+														<div class="field">
+														{% if data.soa.uploaded_supporting_docs == True %}
+														<img class="checkbox-image" name="1" id="1" src="{{ config['API_SERVER'] }}static/img/icon-tickbox.svg" alt="image" class="is-inline-block">
+														{% else %}
+														<input class="is-checkradio" id="1" type="checkbox" name="1">
+														{% endif %}
+														<label for="1"> I have uploaded invoices and support documentation</label>
+														</div>
+													</li>
+													<li>
+														<div class="field">
+														{% if data.soa.verification_calls == True %}
+														<img class="checkbox-image" name="2" id="2" src="{{ config['API_SERVER'] }}static/img/icon-tickbox.svg" alt="image" class="is-inline-block">
+														{% else %}
+														<input class="is-checkradio" id="2" type="checkbox" name="date">
+														{% endif %}
+														<label for="2"> I have done verification calls</label>
+														</div>
+													</li>
+													<li>
+														<div class="field">
+														{% if data.soa.verification_call_notes == True %}
+														<img class="checkbox-image" name="3" id="3" src="{{ config['API_SERVER'] }}static/img/icon-tickbox.svg" alt="image" class="is-inline-block">
+														{% else %}
+														<input class="is-checkradio" id="3" type="checkbox" name="3">
+														{% endif %}
+														<label for="3"> Verification Call Notes</label>
+														</div>
+													</li>
+													<li>
+														<div class="field">
+														{% if data.soa.debtor_approval_emails == True %}
+														<img class="checkbox-image" name="4" id="4" src="{{ config['API_SERVER'] }}static/img/icon-tickbox.svg" alt="image" class="is-inline-block">
+														{% else %}
+														<input class="is-checkradio" id="4" type="checkbox" name="4">
+														{% endif %}
+														<label for="4"> Approval Emails (Debtor)</label>
+														</div>
+													</li>
+													<li>
+														<div class="field">
+														{% if data.soa.email_verification == True %}
+														<img class="checkbox-image" name="5" id="5" src="{{ config['API_SERVER'] }}static/img/icon-tickbox.svg" alt="image" class="is-inline-block">
+														{% else %}
+														<input class="is-checkradio" id="5" type="checkbox" name="5">
+														{% endif %}
+														<label for="5"> Email Verifications</label>
+														</div>
+													</li>
+													<li>
+														<div class="field">
+														{% if data.soa.po_verification == True %}
+														<img class="checkbox-image" name="6" id="6" src="{{ config['API_SERVER'] }}static/img/icon-tickbox.svg" alt="image" class="is-inline-block">
+														{% else %}
+														<input class="is-checkradio" id="6" type="checkbox" name="6">
+														{% endif %}
+														<label for="6"> I have confirmed PO </label>
+														</div>
+													</li>
+													<li>
+														<div class="field">
+														{% if data.soa.proof_of_delivery == True %}
+														<img class="checkbox-image" name="7" id="7" src="{{ config['API_SERVER'] }}static/img/icon-tickbox.svg " alt="image" class="is-inline-block">
+														{% else %}
+														<input class="is-checkradio" id="7" type="checkbox" name="7">
+														{% endif %}
+														<label for="7"> I have confirmed proof of delivery </label>
+														</div>
+													</li>
+													<li>
+														<div class="field">
+														{% if data.soa.estoppel_letters == True %}
+														<img class="checkbox-image" name="8" id="8" src="{{ config['API_SERVER'] }}static/img/icon-tickbox.svg " alt="image" class="is-inline-block">
+														{% else %}
+														<input class="is-checkradio" id="8" type="checkbox" name="8">
+														{% endif %}
+														<label for="8"> Estoppel Letters/Cert.</label>
+ 														</div>
+ 													</li>
+												</ul>
+											</div>
+										</div>
+										<!--<div class="column is-5">
+											<div class="field">
+												<label class="label">Verification Comments</label>
+												<div class="control">
+												{% if data.soa.notes == '' %}
+													<textarea class="textarea" placeholder="Comments or notes"></textarea>
+												{% else %}
+													<textarea class="textarea" placeholder="Comments or notes">
+														{{ data.soa.notes }}
+													</textarea>
+												{% endif %}
+												</div>
+											</div>
+										</div>-->
+									</div>
+								</div>
+							</div>
+						
+							<h1 class="table-title title mt70 pl50">Fees and Advance Amount</h1>
+							<div class="fee-advance-review-table">
+								<div class="columns justify-content-between has-background">
+									<div class="column is-6 is-paddingless">									
+									</div>
+									<div class="column is-3 is-paddingless">
+										<b>(%)</b>
+									</div>
+									<div class="column is-3 is-paddingless has-text-right">
+										<b>Amount</b>
+									</div>
+								</div>
+								<div class="columns justify-content-between ">
+									<div class="column is-6 is-paddingless">
+										<b>Invoice Total </b>
+									</div>
+									<div class="column is-3 is-paddingless">
+									
+									</div>								
+									<div class="column is-3 is-paddingless has-text-right positive">
+										{% if data.soa.invoice_total %}
+												$ {{ data.soa.invoice_total|default("0.00", true) }}
+										{% endif %}
+									</div>
+								</div>
+								<div class="columns justify-content-between has-background">
+									<div class="column is-6 is-paddingless">
+										<b class="nested">Discount Fees (-)</b>
+									</div>
+									<div class="column is-3 is-paddingless"> 
+										{% if data.soa %}
+											{{ data.soa.discount_percentage|float|default("0.00", true) }}%
+										{% endif %}
+									</div>								
+									<div class="column is-3 is-paddingless has-text-right negative">
+										{% if data.soa %}
+											($ {{ data.soa.discount_fees|default("0.00", true) }})
+										{% endif %}
+									</div>
+								</div>
+								<div class="columns justify-content-between has-background align-items-center label-field">
+									<div class="column is-6 is-paddingless">
+										<b class="nested">Fee Adjustment</b>
+									</div>
+									<div class="column is-6 is-paddingless has-text-right">
+										{% if data.soa.fee_adjustment >= 0 %}
+											{% set color_class = "positive" %}
+											{% set fee_adjustment = "" %}
+											{% set start_fee_adj_parenthesis = "" %}
+											{% set end_fee_adj_parenthesis = "" %}
+										{% else %}
+											{% set color_class = "negative" %}
+											{% set fee_adjustment = "-" %}
+											{% set start_fee_adj_parenthesis = "(" %}
+											{% set end_fee_adj_parenthesis = ")" %}
+										{% endif %}
+										<div class="{{ color_class}}">
+											{{ start_fee_adj_parenthesis ~ fee_adjustment }} $
+											{{ data.soa.fee_adjustment|abs }}{{ end_fee_adj_parenthesis }}
+										</div>
+									</div>								
+								</div>
+								<div class="columns justify-content-between has-background align-items-center label-field">
+									<div class="column is-8 is-paddingless nested">
+										<b class="nested">Subtotal Discount Fees </b>
+									</div>									
+									{% if data.subtotal_discount_fees >= 0 %}
+										{% set color_class = "negative" %}
+									{% else %}
+										{% set color_class = "positive" %}
+									{% endif %}
+									<div class="column is-4 is-paddingless has-text-right {{ color_class}}">
+										($ {{ data.subtotal_discount_fees|abs }})
+									</div>									
+								</div>
+								<div class="columns justify-content-between has-background align-items-center label-field">
+									<div class="column is-6 is-paddingless">
+										<b class="nested"> Invoices Held in Reserve (-) </b>
+									</div>
+									<div class="column is-6 is-paddingless has-text-right negative">
+										($ {{ data.invoice_total_held|default("0.00", true) }})
+									</div>
+								</div>
+								<div class="columns justify-content-between has-background mt-30">
+									<div class="column is-6 is-paddingless">
+										<b class="nested">Reserves Withheld (-) </b>
+									</div>
+									<div class="column is-3 is-paddingless">
+										{% if data.soa %}
+											{{ data.soa.reserves_withheld_percentage|float|default("0", true) }}%
+										{% endif %}
+									</div>								
+									<div class="column is-3 is-paddingless has-text-right negative">
+										{% if data.soa %}
+											($ {{ data.soa.reserves_withheld|default("0.00", true) }})
+										{% endif %}
+									</div>
+								</div>
+								<div class="columns justify-content-between has-background align-items-center label-field">
+									<div class="column is-8 is-paddingless">
+										<b class="nested">Additional Cash Reserve Held (-)</b>
+									</div>
+									<div class="column is-4 is-paddingless has-text-right">
+										<div class="column is-paddingless has-text-right negative"> 
+											{% if data.soa %}
+												($ {{ '{0:,.2f}'.format(data.soa.additional_cash_reserve_held)|default("0.00", true) }})
+											{% endif %}
+										</div>
+									</div>								
+								</div>
+								<!-- <div class="columns justify-content-between has-background align-items-center label-field mt-30">
+									<div class="column is-8 is-paddingless">
+										<b>Cash Reserve Release from Invoices (+)</b>
+									</div>
+									<div class="column is-4 is-paddingless has-text-right">
+										<div class="positive">
+											$ {{ data.cash_reserve_releases|default("0.00", true) }}
+										</div>
+									</div>
+								</div> -->
+								<div class="columns justify-content-between has-background align-items-center label-field">
+									<div class="column is-8 is-paddingless">
+										<b>Additional Cash Reserve Release (+)</b>
+									</div>
+									<div class="column is-4 is-paddingless has-text-right">
+										<div class="positive">
+											{% if data.soa %}
+												$ {{ '{0:,.2f}'.format(data.soa.additional_cash_reserve_release)|default("0.00", true) }}
+											{% endif %}
+										</div>
+									</div>								
+								</div>
+								<div class="columns justify-content-between has-background align-items-center label-field input-row">
+									<div class="column is-8 is-paddingless">
+										<b>Adjustment from AE (+)</b>
+									</div>
+									<div class="column is-4 is-paddingless has-text-right positive">
+											$ {{ data.adjustment_from_ae|default("0.00", true) }}
+									</div>
+								</div>
+								<div class="columns justify-content-between align-items-center label-field">
+									<div class="nested column is-2 is-paddingless">
+										<b class="nested">Reason:</b>
+									</div>
+									<div class="column is-8 is-paddingless has-text-right">
+										{{ data.reason_adjustment_from_ae|default("None", true) }}
+									</div>
+								</div>
+								<div class="columns justify-content-between align-items-center label-field total">
+									<div class="column is-6 is-paddingless">
+										<b>Advance Amount </b>
+									</div>
+									
+									<div class="column is-6 is-paddingless has-text-right">
+										<span class="positive"><b>
+											{% if data.soa %}
+												$ {{ data.soa.advance_amount|default("0.00", true) }}
+											{% endif %}</b>
+										</span>
+									</div>								
+								</div>
+								<div class="columns justify-content-between align-items-center label-field">
+									<div class="column is-9 is-paddingless">
+										<b>Miscellaneous Adjustment (-)</b>
+									</div>
+									<div class="column is-3 is-paddingless has-text-right">
+										<div class="negative">
+											($ {{ '{0:,.2f}'.format(data.miscellaneous_adjustment)|default("0.00", true) }})
+										</div>
+									</div>
+								</div>
+
+								<div class="columns justify-content-between align-items-center label-field">
+										<div class="column is-9 is-paddingless">
+											<b>Disbursment Total</b>
+										</div>
+										<div class="column is-3 is-paddingless has-text-right">
+											<div class="positive">
+													$ {{ data.disbursement_amount|default("0.00", true) }}
+											</div>
+										</div>
+									</div>
+								
+							</div>
+						</section>
+
+						<section class="section-content">						
+							<div class="full-summary-table mb30">
+								<h1 class="title table-title mb30">Disbursement Details </h1>
+								<div class="submission-summary">
+									<h1 class="title table-title">Client</h1>
+									<table class="table">
+									<thead>
+										<tr>
+										<!-- <th>Client's Bank Account</th> -->
+										<th>Payment Method</th>
+										<th>Fee to Client</th>
+										<th>Net Amount</th>
+										</tr>
+									</thead>
+										{% if data.client_soa_disbursement %}
+											{% for client_soa in data.client_soa_disbursement %}								  		
+												<tbody>
+													<tr>
+														<!-- <td>{{ client_soa.client_account}}</td> -->
+														<td>{{ client_soa.payment_method }}</td>
+														<td>${{ '{0:,.2f}'.format(client_soa.client_fee | float |default(0.00, true) ) }}</td>
+														<td>$ {{ '{0:,.2f}'.format(client_soa.client_amount| float |default(0.00, true)) }}</td>
+													</tr>
+												</tbody>
+											{% endfor %} 
+										{% else %} 
+											<tbody>
+												<tr>
+													<td colspan="4" style="text-align:center;">No Data</td>
+												</tr>										
+											</tbody>
+										{% endif %}
+									</table>
+								</div>
+							</div>
+
+							<div class="full-summary-table">
+								<div class="submission-summary">
+									<h1 class="title table-title">Additional Payees</h1>
+									<table class="table mb0">
+									<thead>
+										<tr>
+											<th class="pname">Third Party Name</th>
+											<!-- <th class="bank">Bank Account</th> -->
+											<th class="payment">Payment Method</th>
+											<th class="rate">Fee to Client</th>
+											<th class="fee">Fee to Third Party</th>
+											<th class="ticket_number">Ticket No.</th>
+											<th class="Amount">Net Amount</th>
+										</tr>
+									</thead>
+										{% if data.payee_soa_disbursement %}
+											{% for payee_soa in data.payee_soa_disbursement %}	
+												<tbody>
+													<tr>
+														<td>
+														{% if payee_soa.payee_is_new == True %}
+															{{ payee_soa.payee_name }}
+															<span class="lcei-info poppins-bold">
+																New!
+															</span>
+														{% else %}
+														{{ payee_soa.payee_name }}
+														{% endif %}
+														</td>
+														<td>{{ payee_soa.payment_method }}</td>
+														<td>${{ '{0:,.2f}'.format(payee_soa.client_fee | float | default(0.00, true)) }} </td>
+														<td>${{ '{0:,.2f}'.format(payee_soa.third_party_fee | float | default(0.00, true)) }} </td>
+														<td> {{ payee_soa.tp_ticket_number  }}</td>
+														{% if payee_soa.amount %}
+														<td>${{ '{0:,.2f}'.format(payee_soa.amount|default("0.00", true)) }}</td>
+														{% else %}
+														<td>${{ payee_soa.amount }}</td>
+														{% endif %}
+													</tr>										
+												</tbody>
+											{% endfor %} 
+										{% else %} 
+											<tbody>
+												<tr>
+													<td colspan="7" style="text-align:center;">No Data</td>
+												</tr>										
+											</tbody>
+										{% endif %}
+										<thead>
+											<tr>
+												
+												<th colspan="5" class="has-text-right">
+													<b>Advance Amount</b>
+												</th>
+												<th colspan="2" class="has-text-primary">
+													$ {{ data.soa.advance_amount|default("0.00", true) }}
+												</th>
+											</tr>
+											{% if data.total_fee_to_client %}
+												<tr>
+													<th colspan="5" class="has-text-right">
+														<b>Fee to Client</b>
+													</th>
+													<th colspan="2" class="has-text-primary">
+														$ {{ '{0:,.2f}'.format(data.total_fee_to_client)|default("0.00", true) }}
+													</th>
+												</tr>
+											{% endif %}
+											<!-- {% if data.wire_fees %}
+												<tr>
+													<th colspan="5" class="has-text-right">
+														<b>Fee to Client</b>
+													</th>
+													<th colspan="2" class="has-text-primary">
+														$ {{ '{0:,.2f}'.format(data.wire_fees)|default("0.00", true) }}
+													</th>
+												</tr>
+											{% endif %} -->
+											<!-- {% if data.tp_fees %}
+												<tr>
+													<th colspan="5" class="has-text-right">
+														<b>Fee to Third Party</b>
+													</th>
+													<th colspan="2" class="has-text-primary">
+														$ {{ '{0:,.2f}'.format(data.tp_fees)|default("0.00", true) }}
+													</th>
+												</tr>
+											{% endif %} -->
+											<tr>
+												<th colspan="5" class="has-text-right">
+													<b>Disbursement Total</b>
+												</th>
+												<th colspan="2" class="has-text-primary">
+													$ {{ data.disbursement_amount|default("0.00", true) }}
+												</th>
+											</tr>
+											<tr>
+												<th colspan="5" class="has-text-right">
+													<b>Outstanding Amount</b>
+												</th>
+												{% if data.outstanding_amount < 0 %}
+													{% set outstanding_amount_color_class = "negative" %}
+												{% else %}
+													{% set outstanding_amount_color_class = "positive" %}
+												{% endif %}
+												<th colspan="2" class="has-text-primary {{outstanding_amount_color_class}}">
+													$ {{ '{0:,.2f}'.format(data.outstanding_amount)|default("0.00", true) }}
+												</th>
+											</tr>
+											{% if data.fee_to_principal %}
+												<tr>
+													<th colspan="5" class="has-text-right">
+														<b>Fee to Principal</b>
+													</th>
+													<th colspan="2" class="has-text-primary">
+														$ {{ '{0:,.2f}'.format(data.fee_to_principal)|default("0.00", true) }}
+													</th>
+												</tr>
+											{% endif %}											
+										</thead>
+									</table>
+								</div>
+							</div>
+						</section>
+
+						<section class="section-content">
+							<section class="section-content pdf-width">
+								<h1 class="title table-title">Invoice Support Documentation and Collateral</h1>
+								<div class="has-text-centered lcei-info mt30">
+								{% if data.get_soa_supporting_documents %}
+									<!-- for docs not image -->
+									{% set supporting_documents_flag = [] %}
+									{% for supporting_documents in data.get_soa_supporting_documents %}
+										{% set __ = supporting_documents_flag.append(1) %}
+										<div class="has-text-left">
+											<span style="color: rgb(128, 123, 123) !important;">{{ supporting_documents_flag|length }}.  &nbsp;</span>
+											<span style="color: #000000 !important; font-style: italic "> {{ supporting_documents.name + supporting_documents.ext }}</span><br>
+										</div>
+									{% endfor %}
+									<br>
+									<!-- for docs are image -->
+									{% for supporting_documents in data.get_soa_supporting_documents %}
+										{% if supporting_documents.ext and supporting_documents.ext not in data.supporting_doc_not_image_ext %}
+											<img style="border:1px solid #555;height:200px;width:200px;" src="{{ supporting_documents.url }}" alt="{{ supporting_documents.name + supporting_documents.ext }}" loading="eager">
+										{% endif %}
+									{% endfor %}
+								{% else %}
+									No Documents
+								{% endif %}
+								</div>
+							</section>
+						</section>
+
+						<section class="section-content">						
+							<div class="full-summary-table">
+								<div class="submission-summary">
+									<h1 class="title table-title">Supporting Documents for Invoices</h1>
+									<table class="table">
+									<thead>
+										<tr>
+										<th>Invoice Number</th>
+										<th>Debtor Name</th>
+										<th>Supporting Document File</th>
+										</tr>
+									</thead>
+										{% if data.soa_invoice_supporting_documents %}
+											{% for invoice_supporting_documents in data.soa_invoice_supporting_documents %}
+											<tbody>
+												<tr>
+													<td>{{ invoice_supporting_documents.invoice_number }}</td>
+													<td>{{ invoice_supporting_documents.debtor_name }}</td>
+													<td>{{ invoice_supporting_documents.name + invoice_supporting_documents.ext }}</td>
+												</tr> 
+											</tbody>
+											{% endfor %}  
+										{% else %} 
+											<tbody>
+												<tr>
+													<td colspan="6" style="text-align:center;">There is no Supporting Document File for Invoice in this request.</td>
+												</tr>										
+											</tbody>                                  
+										{% endif %}																		 	
+									</table>
+								</div>
+							</div>
+						</section>
+
+						{% if 'verification_notes' in data.show_requests %}
+						<section class="section-content">						
+							<div class="full-summary-table">
+								<div class="submission-summary">
+									<h1 class="title table-title">Verification Notes</h1>
+									<table class="table">
+									<thead>
+										<tr>
+										<th>Invoice Number</th>
+										<th>Debtor Name</th>
+										<th>Verification Type/Method</th>
+										<th>Contact</th>
+										<th>Notes</th>
+										</tr>
+									</thead>
+										{% if data.soa_verification_notes %}
+											{% for verification_notes in data.soa_verification_notes %}
+											<tbody>
+												<tr>
+													<td>{{ verification_notes.invoice_number }}</td>
+													<td>{{ verification_notes.debtor_name }}</td>
+													<td>{{ verification_notes.verification_type_or_method }}</td>
+													<td>{{ verification_notes.contact }}</td>
+													<td>{{ verification_notes.notes }}</td>
+												</tr> 
+											</tbody>
+											{% endfor %}  
+										{% else %} 
+											<tbody>
+												<tr>
+													<td colspan="6" style="text-align:center;">There is no verification notes in this request.</td>
+												</tr>										
+											</tbody>                                  
+										{% endif %}																		 	
+									</table>
+								</div>
+							</div>
+						</section>
+						{% endif %}
+
+						<section class="section-content pdf-width">
+							<h1 class="title table-title">Certificate and Signature</h1>
+							<div class="desc">
+								<p style="text-align: justify; text-justify: inter-word;">
+									{% if data.disclaimer_text %}
+										{{ data.disclaimer_text }}</br>
+									{% endif %}
+								</p>	
+							</div>
+
+							<div class="name-section">
+								<div class="columns justify-content-between">
+									<div class="column is-4">
+										<div class="name-block">
+											<p class="user-name">
+												{% if data.principal_email %}
+													{{ data.soa_submitted_by|default("", true) }}</br>
+													{{ data.principal_email|default("", true) }}</br>
+													{{ data.soa_submitted_at.strftime("%Y-%m-%d %H:%M:%S") }}
+												{% else %}
+													<span></span><br>
+												{% endif %}
+											</p>
+											<p class="name-title">Principal's Name</p>
+										</div>
+									</div>
+									{% if data.soa_approved_by %}
+										<div class="column is-4">
+											<div class="name-block">
+												<p class="user-name">
+													{% if data.principal_email %}
+														<span></span><br>
+														<span></span><br>
+													{% endif %}
+													{{ data.soa_approved_by|default("", true) }}
+												</p>
+												<p class="name-title">Account Executive's Name</p>
+											</div>
+										</div>
+									{% endif %}
+									<!-- {% if data.soa_completed_by %}
+										<div class="column is-4">
+											<div class="name-block">
+												<p class="user-name">
+													{{ data.soa_completed_by|default("", true) }}
+												</p>
+												<p class="name-title">Backend Office's Name</p>
+											</div>
+										</div>
+									{% endif %} -->
+									<div class="column is-4">
+										<div class="name-block">
+											<p class="user-name">
+												{% if data.principal_email %}
+													<span></span><br>
+													<span></span><br>
+												{% endif %}
+												{% if data.client %}
+													{{ data.client.name|default("", true) }}
+												{% endif %}
+											</p>
+											<p class="name-title">Client's Name</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</section>
+					</section>
+				</div>
+			</div>
+		</main>
+	</body>
+</html>

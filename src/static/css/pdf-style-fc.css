@@ -1,0 +1,277 @@
+html {
+    font-size: 8px;
+}
+
+.pdf-page {
+    color: #000;
+    font-size: 8px;
+}
+
+.pdf-page .container {
+    max-width: 610px;
+}
+
+.pdf-page .main-section-header {
+    background: #f7f7f7;
+    padding: 15px;
+    font-size: 8px;
+    line-height: 120%;
+}
+
+.pdf-page .main-section-header .id {
+    font-size: 8px;
+    line-height: 120%;
+    font-family: "Poppins", sans-serif;
+    color: #000;
+    font-weight: normal;
+}
+
+.pdf-page .main-section-header .country-flag {
+    width: 15px;
+}
+
+.pdf-page .main-section-header .lcei-info {
+    margin-left: 10px;
+    margin-right: 5px;
+}
+
+.pdf-page .main-section-header .date {
+    color: #000;
+    font-size: 8px;
+    line-height: 120%;
+    font-weight: 400;
+    font-family: "Poppins", sans-serif;
+}
+
+.pdf-page .section-content {
+    padding: 20px;
+}
+
+.pdf-page .summary-content-container {
+    max-width: 510px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.pdf-page .summary-content.invoice-summary.section-content {
+    padding: 20px;
+}
+
+.pdf-page .summary-content.invoice-summary .step-status .step-info .description {
+    font-size: 7px;
+}
+
+.pdf-page .summary-content.invoice-summary .step-status .icon {
+    height: 12px;
+    width: 12px;
+    margin-right: 10px;
+}
+
+.pdf-page .summary-content.invoice-summary .step-status .icon img {
+    height: 12px;
+    width: 12px;
+}
+
+.pdf-page .section-content.pdf-width {
+    max-width: 478px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.pdf-page .section-content .title.table-title {
+    font-size: 10px;
+    color: #000;
+}
+
+.pdf-page .full-summary-table {
+    max-width: 478px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.pdf-page .full-summary-table .table thead th {
+    padding: 5px 10px;
+    color: #000;
+}
+
+.pdf-page .full-summary-table .table thead th.invoice {
+    min-width: 90px;
+}
+
+.pdf-page .full-summary-table .table thead th.date {
+    min-width: 80px;
+}
+
+.pdf-page .full-summary-table .table thead th.terms {
+    min-width: 50px;
+}
+
+.pdf-page .full-summary-table .table thead th.pon {
+    min-width: 70px;
+}
+
+.pdf-page .full-summary-table .table thead th.pname {
+    min-width: 74px;
+}
+
+.pdf-page .full-summary-table .table thead th.bac {
+    min-width: 76px;
+}
+
+.pdf-page .full-summary-table .table thead th.payment {
+    min-width: 89px;
+}
+
+.pdf-page .full-summary-table .table thead th.rate {
+    min-width: 75px;
+}
+
+.pdf-page .full-summary-table .table thead th.fee {
+    min-width: 104px;
+}
+
+.pdf-page .full-summary-table .table thead th.Amount {
+    min-width: 65px;
+}
+
+.pdf-page .full-summary-table .table tr td {
+    padding: 10px 10px;
+    color: #000;
+}
+
+.pdf-page .invoice-schedule-summary {
+    margin-top: 30px;
+}
+
+.pdf-page .invoice-schedule-summary .title {
+    font-size: 10px;
+    color: #000;
+    font-family: "roboto", "sans-serif";
+}
+
+.pdf-page .invoice-schedule-summary .summary-item {
+    margin-bottom: 12px;
+}
+
+.pdf-page .invoice-schedule-summary .summary-item .summary-heading {
+    margin-bottom: 4px;
+}
+
+.pdf-page .invoice-schedule-summary .summary-item .notification.request-created.is-success {
+    border: 3px solid #7EC36D;
+    border-width: 1px;
+    padding: 5px 5px;
+}
+
+.pdf-page .invoice-schedule-summary .summary-item .notification .icon {
+    margin-right: 15px;
+    height: 15px;
+    width: 10px;
+}
+
+.pdf-page .invoice-schedule-summary .summary-item .notification .icon img {
+    width: 15px;
+    height: 15px;
+}
+
+.pdf-page .advance-details-section {
+    font-size: 10px;
+}
+
+.pdf-page .advance-details-section ::placeholder {
+    font-size: 10px;
+}
+
+.pdf-page .advance-details-section .label {
+    font-size: 10px;
+}
+
+.pdf-page .advance-details-section .textarea {
+    font-size: 10px;
+}
+
+.pdf-page .advance-details-section .check-list .field label {
+    font-size: 8px;
+}
+
+.pdf-page .advance-details-section .check-list .is-checkradio[type="checkbox"]+label::before {
+    width: 12px;
+    height: 12px;
+    top: 0px;
+}
+
+.pdf-page .advance-details-section .check-list .is-checkradio[type="checkbox"]+label::after {
+    top: 2px;
+    left: 4px;
+    height: 0.7rem;
+}
+
+.pdf-page .fee-advance-review-table {
+    font-size: 8.5px;
+    max-width: 335px;
+}
+
+.pdf-page .fee-advance-review-table .label {
+    font-size: 8.5px;
+    color: #000;
+}
+
+.pdf-page .fee-advance-review-table .label-field {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.pdf-page .fee-advance-review-table b {
+    font-family: poppins;
+    font-weight: 400;
+}
+
+.pdf-page .fee-advance-review-table .columns {
+    margin-bottom: 7px;
+}
+
+.pdf-page .name-section .user-name {
+    padding-bottom: 10px;
+    min-height: 30px;
+}
+
+.pdf-page .logo {
+    width: 56px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.pdf-page .header-title {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 35px;
+    font-size: 10px;
+}
+
+.pdf-page .pg-content {
+    padding-bottom: 60px !important;
+}
+
+.pdf-page .desc p {
+    font-family: poppins;
+    font-weight: 300;
+}
+
+.negative {
+    color: #da383d !important;
+}
+
+.positive {
+    color: green !important;
+}
+
+.nested {
+    padding-left: 20px!important;
+}
+
+.mt-30 {
+    margin-top: 30px;
+}
+
+
+/*# sourceMappingURL=pdf-style.css.map */

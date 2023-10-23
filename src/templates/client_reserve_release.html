@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<!-- saved from url=(0099)http://dmbdemo.com/clientwebsite/html-dev/funding-admin-interface/pdf-invoice-schedule-summary.html -->
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Funding Admin - Liquid Capital</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="icon" href="{{ config['API_SERVER'] }}static/img/favicon.ico" type="image/x-icon">
+
+	<link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Roboto:400,500" rel="stylesheet">
+
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css"
+		integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+
+	<link rel="stylesheet" type="text/css" href="{{ config['API_SERVER'] }}static/css/style.css">
+	<link rel="stylesheet" type="text/css" href="{{ config['API_SERVER'] }}static/css/pdf-style.css">
+
+</head>
+<style>
+	.logo {
+		width: 300px;
+		height: 100px;
+	}
+
+	/* Table Header fields overlapping fixed: https://github.com/wkhtmltopdf/wkhtmltopdf/issues/2367  */
+	thead {
+		display: table-header-group
+	}
+
+	tfoot {
+		display: table-row-group
+	}
+
+	tr {
+		page-break-inside: avoid
+	}
+
+	div .detail {
+		page-break-inside: avoid
+	}
+
+	div .desc {
+		page-break-inside: avoid
+	}
+
+	div .summary-content-container {
+		page-break-inside: avoid
+	}
+
+	div .center-fixed-width-container {
+		page-break-inside: avoid
+	}
+
+	div .full-summary-table {
+		page-break-inside: avoid
+	}
+
+	.fee-advance-review-table .columns.justify-content-between {
+		page-break-inside: avoid
+	}
+
+	.fee-advance-review-table {
+		max-width: 550px !important;
+	}
+</style>
+
+<body>
+
+	<!-- Page Body ---------------------------------------------------------->
+	<main>
+		<div>
+			<div class="column pg-main-column is-paddingless">
+				<!-- Page Content ---------------------->
+				<section class="section pg-content is-paddingless has-shadow has-background-white">
+					<section class="main-section-header">
+						<div class="columns mb0">
+							<div class="column is-5 pb0">
+								<img class="logo" src="{{ data.branding_logo_url }}" alt="logo">
+								<p class="header-title roboto-medium">Reserve Release Summary</p>
+							</div>
+						</div>
+
+					</section>
+					<section class="main-section-header">
+						<div class="columns">
+							<div class="column">
+								<div>
+									<span class="poppins-regular">
+										{% if data.client %}
+										{{ data.client.name }}
+										{% endif %}
+									</span>
+									<span class="lcei-info poppins-bold">
+										{% if data.control_account_name %}
+										{{ data.control_account_name }}
+										{% endif %}
+									</span>
+									{% if data.control_account_name %}
+									{% if data.control_account_name == 'LCEC CDN' %}
+									<img src="{{ config['API_SERVER'] }}static/img/canada-flag.png">
+									{% elif data.control_account_name == 'LCEC US' %}
+									<img src="{{ config['API_SERVER'] }}static/img/us-flag.png">
+									{% elif data.control_account_name == 'LCEI. US' %}
+									<img src="{{ config['API_SERVER'] }}static/img/us-flag.png">
+									{% endif %}
+									{% endif %}
+									</span>
+								</div>
+								<div class="id poppins-regular">Reserve Release ID:
+									{% if data.reserve_release %}
+									{{ data.reserve_release.ref_client_rr_id }}
+									{% endif %}
+									{% if data.reserve_release.high_priority %}
+									<span style="color: #da3838; font-style: italic ">(ASAP)</span>
+									{% endif %}
+									{% if data.reserve_release.has_action_required %}
+									<span class="lcei-info poppins-bold">ACTION REQUIRED</span>
+									{% endif %}
+									<br>
+									Cadence ID:
+									{% if data.client %}
+									{{ data.client.ref_client_no }}
+									{% endif %} <br>
+									Payment Type:
+									{% if data.payment_type %}
+										{{ data.payment_type |join(", ") }} 
+									{% endif %} <br>
+									Client Number:
+									{% if data.reserve_release %}
+									{{ data.reserve_release.client_id }}
+									{% endif %} <br>
+									Reference Number:
+									{% if data.reserve_release %}
+										{{ data.reserve_release.reference_number|default("", true) }}
+									{% endif %}
+
+								</div>
+							</div>
+							<div class="column has-text-right">
+								<div class="date poppins-regular">
+									{% if data.reserve_release_submitted_at %}
+										Submission Date: {{ data.reserve_release_submitted_at.strftime('%B %d, %Y')  }}
+									{% else %}
+										Submission Date: Request has not been submitted yet by Principal
+									{% endif %}
+								</div>
+								<div class="date poppins-regular">
+									{% if data.current_time %}
+										Download Date: {{ data.current_time.strftime('%B %d, %Y')  }}
+									{% endif %}
+								</div>
+								<div class="poppins-regular">
+								</div>
+							</div>
+						</div>
+					</section>
+
+					<section class="section-content summary-content has-shadow-black-light soa-section invoice-summary">
+						<div class="summary-content-container">
+							<div class="columns is-multiline">
+								<div class="column is-3 is-flex">
+									<div class="step-status is-completed">
+										<div class="icon is-small">
+											<img src="{{ config['API_SERVER'] }}static/img/icon_checkmark.svg" alt="">
+										</div>
+										<div class="step-info">
+											<h4 class="count">Step 1: Advance Amount</h4>
+											<p class="description">
+												{% if data.reserve_release %}
+												$ {{ data.reserve_release.advance_amount }}
+												{% endif %}
+											</p>
+										</div>
+									</div>
+								</div>
+								<div class="column is-3 is-flex">
+									<div class="step-status">
+										<div class="icon is-small">
+											<img src="{{ config['API_SERVER'] }}static/img/icon_checkmark.svg" alt="">
+										</div>
+										<div class="step-info">
+											<h4 class="count">Step 2: Disbursement Total</h4>
+											<p class="description">
+												{% if data.client %}
+												Client: {{ data.client.name }}</br>
+												{% endif %}
+												{% if data.client_reserve_release_disbursement %}
+												{% for client_reserve_release in data.client_reserve_release_disbursement %}
+												$ {{ '{0:,.2f}'.format(client_reserve_release.client_amount) }}
+												</br>
+												{% endfor %}
+												{% endif %}
+											</p>
+											<p class="description">
+												{% if data.payee_reserve_release_disbursement %}
+												{% for payee_reserve_release in data.payee_reserve_release_disbursement %}
+												Payee: {{ payee_reserve_release.payee_name|default("", true) }} <br>
+												$ {{ '{0:,.2f}'.format(payee_reserve_release.amount) }}
+												</br>
+												{% endfor %}
+												{% endif %}
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+					<section class="section-content">
+						<h1 class="table-title title mt70 pl50">Advance Amount</h1>
+						<div class="fee-advance-review-table" style="max-width: 600px !important;">
+
+							<div class="columns justify-content-between has-background align-items-center label-field">
+								<div class="column is-6 is-paddingless">
+									<b>Total Charge to Reserves </b>
+								</div>
+								
+								<div class="column is-6 is-paddingless has-text-right">
+									<span class="positive"><b>
+										{% if data.reserve_release %}
+											$ {{ data.reserve_release.advance_amount|default("0.00", true) }}
+										{% endif %}</b>
+									</span>
+								</div>								
+							</div>
+							<div class="columns justify-content-between has-background align-items-center label-field">
+								<div class="column is-9 is-paddingless">
+									<b>Discount Fee Adjustment (+/-)</b>
+								</div>
+								{% if data.reserve_release.discount_fee_adjustment < 0 %}
+									{% set disc_fee_color_class = "positive" %}
+									{% set disc_fee = "" %}
+									{% set start_disc_fee_parenthesis = "" %}
+									{% set end_disc_fee_parenthesis = "" %}
+								{% else %}
+									{% set disc_fee_color_class = "negative" %}
+									{% set disc_fee = "-" %}
+									{% set start_disc_fee_parenthesis = "(" %}
+									{% set end_disc_fee_parenthesis = ")" %}
+								{% endif %}
+								<div class="column is-3 is-paddingless has-text-right {{ disc_fee_color_class }}">
+									{{ start_disc_fee_parenthesis }}$ 
+									{{ data.reserve_release.discount_fee_adjustment|abs }}{{ end_disc_fee_parenthesis }}
+								</div>
+							</div>
+							<div class="columns justify-content-between has-background align-items-center label-field">
+								<div class="column is-6 is-paddingless">
+									<b>Reason For Discount Fee Adjustment </b>
+								</div>
+								
+								<div class="column is-6 is-paddingless has-text-right">
+									{% if data.reserve_release.reason_for_disc_fee_adj %}
+										{{ data.reserve_release.reason_for_disc_fee_adj }}
+									{% else %}
+										None
+									{% endif %}</b>
+								</div>								
+							</div>
+							<div class="columns justify-content-between has-background align-items-center label-field">
+								<div class="column is-9 is-paddingless">
+									<b>Miscellaneous Adjustment (+/-)</b>
+								</div>
+								{% if data.reserve_release.miscellaneous_adjustment < 0 %}
+									{% set misc_adj_color_class = "positive" %}
+									{% set misc_adj = "" %}
+									{% set start_misc_adj_parenthesis = "" %}
+									{% set end_misc_adj_parenthesis = "" %}
+								{% else %}
+									{% set misc_adj_color_class = "negative" %}
+									{% set misc_adj = "-" %}
+									{% set start_misc_adj_parenthesis = "(" %}
+									{% set end_misc_adj_parenthesis = ")" %}
+								{% endif %}
+								<div class="column is-3 is-paddingless has-text-right {{ misc_adj_color_class }}">
+									{{ start_misc_adj_parenthesis }}$ 
+									{{ data.reserve_release.miscellaneous_adjustment|abs }}{{ end_misc_adj_parenthesis }}
+								</div>
+							</div>
+							<div class="columns justify-content-between has-background align-items-center label-field">
+								<div class="column is-6 is-paddingless">
+									<b>Reason For Miscellaneous Adjustment </b>
+								</div>
+								
+								<div class="column is-6 is-paddingless has-text-right">
+									{% if data.reserve_release.reason_miscellaneous_adj %}
+										{{ data.reserve_release.reason_miscellaneous_adj }}
+									{% else %}
+										None
+									{% endif %}</b>
+								</div>								
+							</div>
+							<div style="width: 74%; margin-left: auto;">
+								<hr style="border: 1px solid #2e2d2e;">
+								<div class="columns justify-content-between align-items-center label-field">
+									<div class="column is-9 is-paddingless">
+										<b>Advance Subtotal </b>
+									</div>
+									<div class="column is-3 is-paddingless has-text-right">
+										<span class="positive">
+											<b>$ {{ '{0:,.2f}'.format(data.reserve_release.advance_subtotal)|default("0.00", true) }}</b>
+										</span>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</section>
+
+					<section class="section-content">
+						<div class="fee-advance-review-table">							
+							<div class="columns justify-content-between has-background align-items-center label-field total">
+								<div class="column is-6 is-paddingless">
+									<b>Advance Subtotal </b>
+								</div>
+								
+								<div class="column is-6 is-paddingless has-text-right">
+									<span class="positive"><b>
+										{% if data.reserve_release %}
+											$ {{ '{0:,.2f}'.format(data.reserve_release.advance_subtotal)|default("0.00", true) }}
+										{% endif %}</b>
+									</span>
+								</div>								
+							</div>
+							<div class="columns justify-content-between has-background align-items-center label-field">
+								<div class="column is-9 is-paddingless">
+									<b>Fee To Client </b>
+								</div>
+								<div class="column is-3 is-paddingless has-text-right negative">
+									($ {{ '{0:,.2f}'.format(data.total_fee_to_client)|default("0.00", true) }})
+								</div>
+							</div>
+							<div style="width: 74%; margin-left: auto;">
+								<hr style="border: 1px solid #2e2d2e;">
+								<div class="columns justify-content-between align-items-center label-field">
+									<div class="column is-9 is-paddingless">
+										<b>Disbursement Total</b>
+									</div>
+									<div class="column is-3 is-paddingless has-text-right">
+										<div class="positive">
+											<b>$ {{ data.disbursement_amount|default("0.00", true) }}</b>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+
+					<section class="section-content">
+						<div class="full-summary-table mb30">
+							<h1 class="title table-title mb30">Disbursement Details </h1>
+							<div class="submission-summary">
+								<h1 class="title table-title">Client</h1>
+								<table class="table">
+									<thead>
+										<tr>
+											<!-- <th>Client's Bank Account</th> -->
+											<th>Payment Method</th>
+											<th>Fee to Client</th>
+											<th>Net Amount</th>
+										</tr>
+									</thead>
+									{% if data.client_reserve_release_disbursement %}
+									{% for client_reserve_release in data.client_reserve_release_disbursement %}
+									<tbody>
+										<tr>
+											<td>{{ client_reserve_release.payment_method }}</td>
+											<td>${{ '{0:,.2f}'.format(client_reserve_release.client_fee | float |default(0.00, true) ) }}
+											</td>
+											<td>$
+												{{ '{0:,.2f}'.format(client_reserve_release.client_amount| float |default(0.00, true)) }}
+											</td>
+										</tr>
+									</tbody>
+									{% endfor %}
+									{% else %}
+									<tbody>
+										<tr>
+											<td colspan="4" style="text-align:center;">No Data</td>
+										</tr>
+									</tbody>
+									{% endif %}
+								</table>
+							</div>
+						</div>
+
+						<div class="full-summary-table">
+							<div class="submission-summary">
+								<h1 class="title table-title">Additional Payees</h1>
+								<table class="table mb0">
+									<thead>
+										<tr>
+											<th class="pname">Third Party Name</th>
+											<!-- <th class="bank">Bank Account</th> -->
+											<th class="payment">Payment Method</th>
+											<th class="rate">Fee to Client</th>
+											<th class="fee">Fee to Third Party</th>
+											<th class="ticket_number">Ticket No.</th>
+											<th colspan="4" class="Amount">Net Amount</th>
+										</tr>
+									</thead>
+									{% if data.payee_reserve_release_disbursement %}
+									{% for payee_reserve_release in data.payee_reserve_release_disbursement %}
+									<tbody>
+										<tr>
+											<td>
+												{% if payee_reserve_release.payee_is_new == True %}
+												{{ payee_reserve_release.payee_name }}
+												<span class="lcei-info poppins-bold">
+													New!
+												</span>
+												{% else %}
+												{{ payee_reserve_release.payee_name }}
+												{% endif %}
+											</td>
+											<td>{{ payee_reserve_release.payment_method }}</td>
+											<td>${{ '{0:,.2f}'.format(payee_reserve_release.client_fee | float | default(0.00, true)) }}
+											</td>
+											<td>${{ '{0:,.2f}'.format(payee_reserve_release.third_party_fee | float | default(0.00, true)) }}
+											</td>
+											<td> {{ payee_reserve_release.tp_ticket_number  }}</td>
+											<td colspan="4">${{ '{0:,.2f}'.format(payee_reserve_release.amount | float | default(0.00, true)) }}
+											</td>
+										</tr>
+									</tbody>
+									{% endfor %}
+									{% else %}
+									<tbody>
+										<tr>
+											<td colspan="7" style="text-align:center;">No Data</td>
+										</tr>
+									</tbody>
+									{% endif %}
+									<thead>
+										<tr>
+											<th colspan="5" class="has-text-right">
+												<b>Total Charge to Reserves</b>
+											</th>
+											<th colspan="2" class="has-text-primary">
+												$ {{ data.reserve_release.advance_amount|default("0.00", true) }}
+											</th>
+										</tr>
+										{% if data.total_fee_to_client %}
+											<tr>
+												<th colspan="5" class="has-text-right">
+													<b>Fee to Client</b>
+												</th>
+												<th colspan="2" class="has-text-primary">
+													$ {{ '{0:,.2f}'.format(data.total_fee_to_client)|default("0.00", true) }}
+												</th>
+											</tr>
+										{% endif %}
+										<tr>
+											<th colspan="5" class="has-text-right">
+												<b>Miscellaneous Adjustment</b>
+											</th>
+											<th colspan="2" class="has-text-primary">
+												$
+												{{ data.reserve_release.miscellaneous_adjustment|default("0.00", true) }}
+											</th>
+										</tr>
+										<tr>
+											<th colspan="5" class="has-text-right">
+												<b>Disbursement Total</b>
+											</th>
+											<th colspan="2" class="has-text-primary">
+												$ {{ data.disbursement_amount|default("0.00", true) }}
+											</th>
+										</tr>
+										<tr>
+											<th colspan="5" class="has-text-right">
+												<b>Outstanding Amount</b>
+											</th>
+											{% if data.outstanding_amount < 0 %}
+												{% set outstanding_amount_color_class = "negative" %}
+											{% else %}
+												{% set outstanding_amount_color_class = "positive" %}
+											{% endif %}
+											<th colspan="2" class="has-text-primary {{outstanding_amount_color_class}}">
+												$ {{ '{0:,.2f}'.format(data.outstanding_amount)|default("0.00", true) }}
+											</th>
+										</tr>
+										{% if data.fee_to_principal %}
+										<tr>
+											<th colspan="5" class="has-text-right">
+												<b>Fee to Principal</b>
+											</th>
+											<th colspan="2" class="has-text-primary">
+												$ {{ '{0:,.2f}'.format(data.fee_to_principal)|default("0.00", true) }}
+											</th>
+										</tr>
+										{% endif %}
+									</thead>
+								</table>
+							</div>
+						</div>
+					</section>
+
+					<section class="section-content">
+						<section class="section-content pdf-width">
+							<h1 class="title table-title">Invoice Support Documentation and Collateral</h1>
+							<div class="has-text-centered lcei-info mt30">
+								{% if data.get_reserve_release_supporting_documents %}
+									<!-- for docs not image -->
+									{% set supporting_documents_flag = [] %}
+									{% for supporting_documents in data.get_reserve_release_supporting_documents %}
+										{% set __ = supporting_documents_flag.append(1) %}
+										<div class="has-text-left">
+											<span style="color: rgb(128, 123, 123) !important;">{{ supporting_documents_flag|length }}.  &nbsp;</span>
+											<span style="color: #007b40 !important;"> {{ supporting_documents.name + supporting_documents.ext }}</span><br>
+										</div>
+									{% endfor %}
+									<br>
+									<!-- for docs are image -->
+									{% for supporting_documents in data.get_reserve_release_supporting_documents %}
+										{% if supporting_documents.ext and supporting_documents.ext not in data.supporting_doc_not_image_ext %}
+											<img style="border:1px solid #555;height:200px;width:200px;" src="{{ supporting_documents.url }}" alt="{{ supporting_documents.name + supporting_documents.ext }}" loading="eager">
+										{% endif %}
+									{% endfor %}
+								{% else %}
+									No Documents
+								{% endif %}
+							</div>
+						</section>
+					</section>
+
+					<section class="section-content pdf-width">
+						<h1 class="title table-title">Signature</h1>
+						<div class="name-section">
+							<div class="columns justify-content-between">
+								<div class="column is-4">
+									<div class="name-block">
+										<p class="user-name">
+											{% if data.client %}
+											{{ data.client.name|default("", true) }}
+											{% endif %}
+										</p>
+										<p class="name-title">Client's Name</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+				</section>
+			</div>
+		</div>
+	</main>
+</body>
+</html>

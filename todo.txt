@@ -1,0 +1,44 @@
+================================================
+===== Saving database snapshot on approval =====
+================================================
+Third-party-sync                    
+DB:
+- lcra
+- cadence
+- funding
+
+
+Funding
+DB:
+- Funding
+
+
+Flow for saving data for client_funds
+* Consider debtors/participants aren't changed or removed.
+
+SOA Create
+    - Searching Clients
+    - Start SOA [client_funds table]
+    - Added invoices
+    - submitted
+    - PDF
+
+AE: Submitted SOA 
+    - Edit SOA [client_funds table]
+    - Edit invoices
+    - Double check - if everything's ok
+    - Approval & send to CRO
+    - PDF
+
+CRO: 
+    - Edit SOA [client_funds: Approval_history table]
+    - Edit invoices
+    - Double check - if everything's ok
+    - Approval
+    - PDF
+
+BO: Approved SOA
+    - Process [client_funds: Approval_history table]
+    - funded   
+    - PDF 
+
