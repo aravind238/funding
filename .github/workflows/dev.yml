@@ -2,8 +2,8 @@ name: My Workflow
 
 on:
   push:
-    branches:
-      - Dev
+    branches: [ Dev ]
+      
 
 jobs:
   build:
