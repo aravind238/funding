@@ -1,7 +1,9 @@
 name: My Workflow
 
-branches:
-  - Devloper
+on:
+  push:
+     branches:
+        - Devloper
 
 jobs:
   build:
