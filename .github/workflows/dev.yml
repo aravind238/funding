@@ -1,8 +1,9 @@
 name: My Workflow
 
-
- branches: [ 'Master' ]
-         
+on:
+  push:
+    branches:
+      - Dev
 
 jobs:
   build:
@@ -16,4 +17,4 @@ jobs:
         run: git pull
 
       - name: Restart nginx
-        run: sudo systemctl restart nginx
+        run: systemctl restart nginx
